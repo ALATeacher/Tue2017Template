@@ -19,7 +19,8 @@ class Player:
     ##########VARIABLES##########
     x = 0
     y = 0
-    
+    vX = 0
+    vY = 0
     collider = None
     
     ##########CONSTRUCTOR##########
@@ -38,6 +39,10 @@ class Player:
         rect = self.image.get_rect()
         print(rect.x,rect.y)
         return (rect.w/2,rect.h/2)
+    def process(self,delta):
+        self.x += self.vX*delta
+        self.vY += .002*delta
+        self.y += self.vY*delta     
 
 class Game:
     ##########VARIABLES##########
@@ -56,7 +61,10 @@ class Game:
     #########MAIN FUNCTION##########
     def main(self):
         playing = True
-        
+        centerOfScreen = self.getCenterOfScreen()
+        centerOfPlayer = self.player.getCenter()
+        self.player.x = centerOfScreen[0]-centerOfPlayer[0]
+        self.player.y = centerOfScreen[1]-centerOfPlayer[1]
         
         ##########GAME LOOP##########
         while playing:
@@ -64,6 +72,10 @@ class Game:
             for event in pygame.event.get():
                 if event.type==QUIT:
                     self.quit()
+                if event.type == KEYDOWN:
+                    if event.key == K_SPACE:
+                        #JUMP
+                        self.player.vY=-1
             self.processLogic(delta)
             self.drawScreen()
             pygame.display.flip()
@@ -73,14 +85,11 @@ class Game:
         sys.exit()
         
     def processLogic(self,delta):
-        pass
+        self.player.process(delta)
     
     def drawScreen(self):
         self.surface.fill(BGCOLOR)
-        centerOfScreen = self.getCenterOfScreen()
-        centerOfPlayer = self.player.getCenter()
-        self.player.x = centerOfScreen[0]-centerOfPlayer[0]
-        self.player.y = centerOfScreen[1]-centerOfPlayer[1]
+        
         self.player.draw(self.surface)
     
     def getCenterOfScreen(self):
